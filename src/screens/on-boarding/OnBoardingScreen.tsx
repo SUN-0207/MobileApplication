@@ -3,21 +3,17 @@ import Onboarding from 'react-native-onboarding-swiper';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import Lottie from 'lottie-react-native';
 import { useNavigation } from '@react-navigation/native';
-import { RootScreens } from '@/shared/enums/RootScreen';
 
 const { width, height } = Dimensions.get('window');
 
-const OnBoardingScreen = () => {
+export const OnBoardingScreen = () => {
   const navigation = useNavigation();
 
-  const handleDone = (screen: RootScreens) => {
-    navigation.navigate(screen);
-  }
   return (
     <View style={styles.container}>
       <Onboarding
-        onDone={() => handleDone(RootScreens.HOME)}
-        onSkip={() => handleDone(RootScreens.HOME)}
+        onDone={() => navigation.navigate('Home' as never)}
+        onSkip={() => navigation.navigate('Home' as never)}
         pages={[
           {
             backgroundColor: '#fff',
@@ -65,5 +61,3 @@ const styles = StyleSheet.create({
     height: height*0.4,
   }
 });
-
-export default OnBoardingScreen;
