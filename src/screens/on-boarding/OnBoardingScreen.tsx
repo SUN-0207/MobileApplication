@@ -20,8 +20,8 @@ export const OnBoardingScreen = () => {
   return (
     <View style={styles.container}>
       <Onboarding
-        onDone={() => navigation.navigate('Home' as never)}
-        onSkip={() => navigation.navigate('Home' as never)}
+        onDone={() => navigation.navigate('Login' as never)}
+        onSkip={() => navigation.navigate('Login' as never)}
         DoneButtonComponent={doneButton}
         pages={[
           {

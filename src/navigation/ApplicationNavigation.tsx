@@ -5,6 +5,7 @@ import { HomeScreen } from '@/screens/home/HomeScreen';
 import { OnBoardingScreen } from '@/screens/on-boarding/OnBoardingScreen';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Login from '@/screens/login/login'; 
 
 const RootStack = createNativeStackNavigator();
 
@@ -29,6 +30,11 @@ export const ApplicationNavigation = () => {
           name="OnBoarding"
           options={{ headerShown: false }}
           component={OnBoardingScreen}
+        />
+         <RootStack.Screen
+          name="Login"
+          options={{ headerShown: false }}
+          component={Login}
         />
         <RootStack.Screen
           name="Home"
