@@ -1,14 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { CachedImage } from './helper/CachedImage';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { ChevronLeftIcon, ClockIcon, FireIcon, UserIcon } from 'react-native-heroicons/outline';
-import { HeartIcon } from 'react-native-heroicons/outline';
-import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
-import Loading from './component/Loading';
-import * as Linking from 'expo-linking';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { CachedImage } from "./helper/CachedImage";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import {
+  ChevronLeftIcon,
+  ClockIcon,
+  FireIcon,
+  UserIcon,
+} from "react-native-heroicons/outline";
+import { HeartIcon } from "react-native-heroicons/outline";
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import Loading from "./component/Loading";
+import * as Linking from "expo-linking";
+import { ActivityIndicator } from "react-native";
 
 interface RecipeDetailScreenProps {
   route: any;
@@ -28,13 +44,15 @@ const RecipeDetailScreen: React.FC<RecipeDetailScreenProps> = (props) => {
 
   const getMealData = async (id: string) => {
     try {
-      const response = await axios.get(`https://themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
+      const response = await axios.get(
+        `https://themealdb.com/api/json/v1/1/lookup.php?i=${id}`
+      );
       if (response && response.data) {
         setMeal(response.data.meals[0]);
         setLoading(false);
       }
     } catch (err) {
-      console.log('error: ', err);
+      console.log("error: ", err);
     }
   };
 
@@ -42,7 +60,7 @@ const RecipeDetailScreen: React.FC<RecipeDetailScreenProps> = (props) => {
     if (!meal) return [];
     let indexes = [];
     for (let i = 1; i <= 20; i++) {
-      if (meal['strIngredient' + i]) {
+      if (meal["strIngredient" + i]) {
         indexes.push(i);
       }
     }
@@ -56,38 +74,65 @@ const RecipeDetailScreen: React.FC<RecipeDetailScreenProps> = (props) => {
       <View key={i} style={styles.ingredientContainer}>
         <View style={styles.bullet} />
         <View>
-          <Text style={styles.ingredientText}>{meal['strMeasure' + i]}</Text>
-          <Text style={styles.ingredientText}>{meal['strIngredient' + i]}</Text>
+          <Text style={styles.ingredientText}>{meal["strMeasure" + i]}</Text>
+          <Text style={styles.ingredientText}>{meal["strIngredient" + i]}</Text>
         </View>
       </View>
     ));
   };
 
-const renderInstructions = () => {
-    if (!meal || !('strInstructions' in meal)) return null;
+  const renderInstructions = () => {
+    if (!meal || !("strInstructions" in meal)) return null;
 
-    const instructionsArray = (meal as any).strInstructions.split('\r\n');
+    const instructionsArray = (meal as any).strInstructions.split("\r\n");
     return instructionsArray.map((instruction: string, index: number) => (
-        <View key={index} style={styles.instructionContainer}>
-            <Text style={styles.instructionText}>{`${index + 1}. ${instruction}`}</Text>
-        </View>
+      <View key={index} style={styles.instructionContainer}>
+        <Text style={styles.instructionText}>{`${
+          index + 1
+        }. ${instruction}`}</Text>
+      </View>
     ));
-};
+  };
 
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollViewContent}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollViewContent}
+      >
         {/* Recipe Image */}
-        <CachedImage uri={item.strMealThumb} style={styles.recipeImage} />
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <Image
+            source={{ uri: item.strMealThumb }}
+            style={{
+              width: wp(100),
+              height: hp(50),
+              borderBottomLeftRadius: 40,
+              borderBottomRightRadius: 40,
+            }}
+          />
+        )}
 
         {/* Back Button and Favourite Icon */}
         <View style={styles.iconContainer}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.icon}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.icon}
+          >
             <ChevronLeftIcon size={hp(3.5)} strokeWidth={4.5} color="#fbbf24" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setIsFavourite(!isFavourite)} style={styles.icon}>
-            <HeartIcon size={hp(3.5)} strokeWidth={4.5} color={isFavourite ? 'red' : 'gray'} />
+          <TouchableOpacity
+            onPress={() => setIsFavourite(!isFavourite)}
+            style={styles.icon}
+          >
+            <HeartIcon
+              size={hp(3.5)}
+              strokeWidth={4.5}
+              color={isFavourite ? "red" : "gray"}
+            />
           </TouchableOpacity>
         </View>
 
@@ -96,8 +141,10 @@ const renderInstructions = () => {
           <Loading size="large" />
         ) : (
           <View style={styles.mealDetailsContainer}>
-            <Text style={styles.mealName}>{(meal as any)?.strMeal || ''}</Text>
-            <Text style={styles.mealArea}>{meal && (meal as any)?.strArea ? (meal as any).strArea : ''}</Text>
+            <Text style={styles.mealName}>{(meal as any)?.strMeal || ""}</Text>
+            <Text style={styles.mealArea}>
+              {meal && (meal as any)?.strArea ? (meal as any).strArea : ""}
+            </Text>
 
             {/* Miscellaneous */}
             <View style={styles.miscContainer}>
@@ -120,11 +167,15 @@ const renderInstructions = () => {
 
             {/* Ingredients */}
             <Text style={styles.sectionHeading}>Ingredients</Text>
-            <View style={styles.ingredientsContainer}>{renderIngredients()}</View>
+            <View style={styles.ingredientsContainer}>
+              {renderIngredients()}
+            </View>
 
             {/* Instructions */}
             <Text style={styles.sectionHeading}>Instructions</Text>
-            <View style={styles.instructionsContainer}>{renderInstructions()}</View>
+            <View style={styles.instructionsContainer}>
+              {renderInstructions()}
+            </View>
           </View>
         )}
       </ScrollView>
@@ -135,7 +186,7 @@ const renderInstructions = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   scrollViewContent: {
     paddingBottom: 30,
@@ -147,8 +198,8 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 40,
   },
   iconContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginHorizontal: wp(5),
     marginTop: hp(2),
   },
@@ -161,50 +212,54 @@ const styles = StyleSheet.create({
   },
   mealName: {
     fontSize: hp(3),
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: hp(1),
   },
   mealArea: {
     fontSize: hp(2),
-    color: '#555',
+    color: "#555",
     marginBottom: hp(2),
   },
   miscContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: hp(2),
+    paddingHorizontal: wp(21),
   },
   miscItem: {
-    alignItems: 'center',
+    alignItems: "center",
+    flexDirection: "row",
   },
   miscTextContainer: {
+    alignItems: "center",
     marginTop: hp(1),
+    marginLeft: hp(1),
   },
   miscValue: {
     fontSize: hp(2),
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   miscLabel: {
     fontSize: hp(1.3),
-    color: '#555',
+    color: "#555",
   },
   sectionHeading: {
     fontSize: hp(2.5),
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: hp(2),
   },
   ingredientsContainer: {
     marginLeft: wp(2),
   },
   ingredientContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: hp(1),
   },
   bullet: {
     height: hp(1.5),
     width: hp(1.5),
-    backgroundColor: '#fbbf24',
+    backgroundColor: "#fbbf24",
     borderRadius: hp(0.75),
     marginRight: wp(2),
   },
@@ -213,7 +268,7 @@ const styles = StyleSheet.create({
   },
   instructionsContainer: {
     borderWidth: 1,
-    borderColor: '#e2e2e2',
+    borderColor: "#e2e2e2",
     borderRadius: 8,
     padding: hp(1.5),
     marginTop: hp(1.5),
@@ -223,7 +278,7 @@ const styles = StyleSheet.create({
   },
   instructionText: {
     fontSize: hp(1.6),
-    color: '#555',
+    color: "#555",
   },
 });
 
