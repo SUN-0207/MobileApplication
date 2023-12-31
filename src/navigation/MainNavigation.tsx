@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import UserInfo from '@/screens/user-info/UserInfo';
 import Cart from '@/screens/cart/Cart';
-import Recipe from '@/screens/recipe/Recipe';
+import { Recipe } from '@/screens/recipe/Recipe';
 import Favorite from '@/screens/favorite/Favorite';
 import Scan from '@/screens/scan/Scan';
 
