@@ -37,7 +37,8 @@ const Scan = () => {
 
   const __takePicture = async () => {
     const photo: any = await camera.takePictureAsync()
-
+    console.log(photo)
+    
     setPreviewVisible(true)
     //setStartCamera(false)
     setCapturedImage(photo)
@@ -202,6 +203,15 @@ const CameraPreview = ({photo, retakePicture}: any) => {
     loadModel();
   }, []);
 
+  const fetchImage = async (photo) => {
+    const res = await fetch(photo.uri, {}, { isBinary: true });
+    const imageDataArrayBuffer = await res.arrayBuffer();
+    const imageData = new Uint8Array(imageDataArrayBuffer);
+    
+    const imageTensor = decodeJpeg(imageData);
+    console.log(imageTensor)
+    return imageTensor
+  };
 
   const handlePrediction = async () => {
     if (!isTfReady) {
@@ -209,21 +219,16 @@ const CameraPreview = ({photo, retakePicture}: any) => {
       return;
     }
   
-    const model = await mobilenet.load()
-
-  // Make predictions
-  const predictions = await model.classify(photo);
-
-  const imageAssetPath = Image.resolveAssetSource(photo.uri);
-  const response = await fetch(imageAssetPath.uri, {}, { isBinary: true });
-  const imageDataArrayBuffer = await response.arrayBuffer();
-  const imageData = new Uint8Array(imageDataArrayBuffer);
-  const imageTensor = decodeJpeg(imageData);
-  const prediction = await model.classify(imageTensor);
-  // Display the results
-  const topPrediction = tf.argMax(prediction, 1).dataSync()[0];
-  console.log(`Predicted class: ${topPrediction}`);
-  navigation.navigate('Recipe' as never);
+    // const model = await mobilenet.load()  
+    // Make predictions
+    // const image = await fetchImage(photo)
+    // const prediction = await model.classify(image);
+    // // Display the results
+    // const topPrediction = tf.argMax(prediction, 1).dataSync()[0];
+    // console.log(`Predicted class: ${topPrediction}`);
+    
+    navigation.navigate('Recipe' as never);
+    retakePicture()
   }
 
   return (
@@ -241,6 +246,7 @@ const CameraPreview = ({photo, retakePicture}: any) => {
           flex: 1
         }}
       >
+      
         <View
           style={{
             flex: 1,

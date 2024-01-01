@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, Button, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TextInput, Button, View, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { StatusBar } from 'native-base';
 
 export default function Login(props) {
     const navigation = useNavigation();
@@ -125,13 +126,21 @@ export default function Login(props) {
                 )}
             </TouchableOpacity>
             {loginStatus && <Text style={styles.warning}>Wrong username/password !</Text>}
+            {formValidity && <Text style={styles.warning}>Please fill all required field !</Text>}
             <TouchableOpacity style={styles.loginButton} onPress={submitLogin}>
                 <Text style={styles.login}>
-                    {isLogin ? 'Login' : 'Sign Up'}
+                    {isLogin ? 'LOGIN' : 'Sign Up'}
                 </Text>
             </TouchableOpacity>
-           
-            {formValidity && <Text style={styles.warning}>Please fill all required field !</Text>}
+            <View style={styles.textContainer}>
+              <Text style={styles.orText}>OR</Text>
+              <Text style={styles.loginUsingText}> Login using</Text>
+            </View>
+            <View style={styles.iconContainer}>
+              <Image style={styles.icon} resizeMode="cover" source={require('@/assets/icon/google.png')} />
+              <Image style={styles.icon} resizeMode="cover" source={require('@/assets/icon/facebook.png')} />
+            </View>
+            <Text style={styles.iconText}>Terms and Conditions & Privacy Policy</Text>
           
         </View>
     );
@@ -141,17 +150,17 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         height: '100%',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         backgroundColor: '#F2F2F7',
       },
       navButtonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        width: '50%',
+        width: '60%',
         marginHorizontal: '40%',
-        marginTop: 0,
-        marginBottom: '30%',
+        marginTop: '15%',
+        marginBottom: '20%',
       },
       ActiveButtonText: {
         color: '#FFFFFF',
@@ -176,9 +185,9 @@ const styles = StyleSheet.create({
         width: '50%',
         height: 30,
         backgroundColor: '#F2F2F7',
-        borderColor: '#3935FF',
-        borderWidth: 1,
-        borderRadius: 6,
+        // borderColor: '#3935FF',
+        // borderWidth: 1,
+        // borderRadius: 6,
         justifyContent: 'center',
         alignItems: 'center',
       },
@@ -229,13 +238,13 @@ const styles = StyleSheet.create({
       },
       title: {
         fontSize: 30,
-        marginBottom: 10,
+        marginBottom: 15,
         color: '#3935FF',
         fontWeight: 'bold'
       },
       subtitle: {
         fontSize: 15,
-        marginBottom: 20,
+        marginBottom: 60,
         color: '#3935FF',
         fontWeight: '500'
       },
@@ -267,5 +276,39 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginLeft: '60%',
         margin: '5%'
+      },
+      icon: {
+        width: 50,
+        height: 50,
+        marginHorizontal: 20,
+      },
+      iconContainer: {
+        flexDirection: 'row',
+        marginTop: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      textContainer: {
+        alignItems: 'center',
+        marginTop: 10,
+      },
+      
+      orText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+      },
+      
+      loginUsingText: {
+        fontSize: 16,
+        color: 'gray',
+        marginTop: 5,
+      },
+      iconText: {
+        marginBottom: 20,
+        fontSize: 12,
+        marginTop: 50,
+        textAlign: 'center',
+        color: '#3935FF',
+        fontWeight: 'bold'
       },
 });

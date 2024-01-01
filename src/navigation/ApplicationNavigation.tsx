@@ -20,7 +20,7 @@ export const ApplicationNavigation = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("https://api.render.com/deploy/srv-clpgk7hoh6hc73c32oeg?key=ymuKpOWiUpo");
+      const response = await axios.post("https://api.render.com/deploy/srv-clpgk7hoh6hc73c32oeg?key=euU9Q6KyNTA");
 
       console.log(response.data);
     } catch (error) {
