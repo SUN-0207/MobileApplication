@@ -1,12 +1,26 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import RecipeDetailScreen from '@/screens/recipe/RecipeDetail';
+import RecipeListScreen from './RecipeList';
 
-const Recipe = () => {
+
+const RecipeStack = createNativeStackNavigator();
+
+export const Recipe = () => {
+
   return (
-    <View>
-      <Text>recipe</Text>
-    </View>
-  )
-}
-
-export default Recipe
+    <RecipeStack.Navigator>
+      <RecipeStack.Screen
+        name="RecipeListScreen"
+        options={{ headerShown: false }}
+        component={RecipeListScreen}
+      />
+      <RecipeStack.Screen
+        name="RecipeDetailScreen"
+        options={{ headerShown: false }}
+        component={RecipeDetailScreen}
+      />
+    </RecipeStack.Navigator>
+  );
+};
