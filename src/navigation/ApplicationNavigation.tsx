@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { HomeScreen } from '@/screens/home/HomeScreen';
+import RecipeDetailScreen from '@/screens/recipe/RecipeDetail';
 import { OnBoardingScreen } from '@/screens/on-boarding/OnBoardingScreen';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -60,6 +61,11 @@ export const ApplicationNavigation = () => {
           name="Home"
           options={{ headerShown: false }}
           component={HomeScreen}
+        />
+        <RootStack.Screen
+          name="RecipeDetail"
+          options={{ headerShown: false}}
+          component={RecipeDetailScreen}
         />
       </RootStack.Navigator>
     </NavigationContainer>
