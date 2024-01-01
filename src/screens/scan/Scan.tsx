@@ -5,6 +5,7 @@ import {StatusBar} from 'expo-status-bar'
 import * as tf from '@tensorflow/tfjs';
 import { fetch, decodeJpeg } from '@tensorflow/tfjs-react-native';
 import * as mobilenet from '@tensorflow-models/mobilenet';
+import { useNavigation } from '@react-navigation/native';
 
 let camera: Camera
 
@@ -184,21 +185,14 @@ const Scan = () => {
 
  
 const CameraPreview = ({photo, retakePicture}: any) => {
-  
   const [isTfReady, setIsTfReady] = useState(false);
- 
+  const navigation = useNavigation();
   useEffect(() => {
     async function loadModel() {
       try {
         await tf.ready();
-        console.log('Loading')
-        const model = await mobilenet.load();
+        // console.log(photo)
         setIsTfReady(true);
-       
-        const response = await fetch(photo.uri, {}, { isBinary: true });
-        console.log(response)
-
-      
       } catch (error) {
         console.error('Error loading model:', error);
         // Handle model loading errors appropriately (e.g., display error message)
@@ -208,6 +202,29 @@ const CameraPreview = ({photo, retakePicture}: any) => {
     loadModel();
   }, []);
 
+
+  const handlePrediction = async () => {
+    if (!isTfReady) {
+      console.log('Model not ready yet');
+      return;
+    }
+  
+    const model = await mobilenet.load()
+
+  // Make predictions
+  const predictions = await model.classify(photo);
+
+  const imageAssetPath = Image.resolveAssetSource(photo.uri);
+  const response = await fetch(imageAssetPath.uri, {}, { isBinary: true });
+  const imageDataArrayBuffer = await response.arrayBuffer();
+  const imageData = new Uint8Array(imageDataArrayBuffer);
+  const imageTensor = decodeJpeg(imageData);
+  const prediction = await model.classify(imageTensor);
+  // Display the results
+  const topPrediction = tf.argMax(prediction, 1).dataSync()[0];
+  console.log(`Predicted class: ${topPrediction}`);
+  navigation.navigate('Recipe' as never);
+  }
 
   return (
     <View
@@ -258,7 +275,7 @@ const CameraPreview = ({photo, retakePicture}: any) => {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              // onPress={handlePrediction}
+              onPress={handlePrediction}
               style={{
                 width: 130,
                 height: 40,
