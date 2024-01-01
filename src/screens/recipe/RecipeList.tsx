@@ -24,6 +24,7 @@ const RecipeListScreen = () => {
   const [activeCategory, setActiveCategory] = useState<string>('Beef');
   const [categories, setCategories] = useState<Category[]>([]);
   const [meals, setMeals] = useState<Meal[]>([]);
+  const [searchContent, setSearchContent] = useState<string>();
 
   useEffect(() => {
     getCategories();
@@ -46,11 +47,17 @@ const RecipeListScreen = () => {
       console.log('error: ', err);
     }
   };
-  const getRecipes = async (category = 'Beef') => {
+  const getRecipes = async (category = 'Beef', searchContent = '') => {
     try {
       const response = await axios.get(`https://themealdb.com/api/json/v1/1/filter.php?c=${category}`);
       if (response && response.data) {
-        setMeals(response.data.meals);
+        if(searchContent) {
+            const filteredResponse = response.data.meals.filter(
+              (meal:Meal) => meal.strMeal.toLowerCase().includes(searchContent.toLowerCase())
+            )
+            setMeals(filteredResponse)
+        }
+        else setMeals(response.data.meals);
       }
     } catch (err) {
       console.log('error: ', err);
@@ -72,6 +79,7 @@ const RecipeListScreen = () => {
             placeholder='Tim cong thuc'
             placeholderTextColor={'gray'}
             style={{fontSize: hp(1.7), flex: 1, marginBottom: 1, paddingLeft: 3, flexDirection: 'row', alignItems: 'center'}}
+            onChangeText={(text) => getRecipes(activeCategory, text)}
           />
           <View style={{backgroundColor:'white', padding: 12, borderRadius:710}}>
             <MagnifyingGlassIcon size={hp(2.5)} strokeWidth={3} color="gray" />
