@@ -1,219 +1,285 @@
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { StatusBar } from 'expo-status-bar';
-import { CachedImage } from './helper/CachedImage';
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import { ChevronLeftIcon, ClockIcon, FireIcon } from 'react-native-heroicons/outline';
-import {  HeartIcon, Square3Stack3DIcon, UsersIcon } from 'react-native-heroicons/solid';
-import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
-import Loading from './component/Loading';
-// import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
-import { Platform } from 'react-native';
-import * as Linking from 'expo-linking';
-
-const ios = Platform.OS=='ios';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { CachedImage } from "./helper/CachedImage";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import {
+  ChevronLeftIcon,
+  ClockIcon,
+  FireIcon,
+  UserIcon,
+} from "react-native-heroicons/outline";
+import { HeartIcon } from "react-native-heroicons/outline";
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import Loading from "./component/Loading";
+import * as Linking from "expo-linking";
+import { ActivityIndicator } from "react-native";
 
 interface RecipeDetailScreenProps {
-    route: any; 
-  }
+  route: any;
+}
 
-  export default function RecipeDetailScreen(props: RecipeDetailScreenProps) {
-    let item = props.route.params;
-    const [isFavourite, setIsFavourite] = useState(false);
-    const navigation = useNavigation();
-    const [meal, setMeal] = useState(null);
-    const [loading, setLoading] = useState(true);
+const RecipeDetailScreen: React.FC<RecipeDetailScreenProps> = (props) => {
+  const { route } = props;
+  const item = route.params;
+  const [isFavourite, setIsFavourite] = useState(false);
+  const navigation = useNavigation();
+  const [meal, setMeal] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(()=>{
-        getMealData(item.idMeal);
-    },[])
+  useEffect(() => {
+    getMealData(item.idMeal);
+  }, []);
 
-    const getMealData = async (id: string)=>{
-        try{
-          const response = await axios.get(`https://themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
-        //   console.log('got meal data: ',response.data);
-          if(response && response.data){
-            setMeal(response.data.meals[0]);
-            setLoading(false);
-          }
-        }catch(err){
-          console.log('error: ',err);
-        }
+  const getMealData = async (id: string) => {
+    try {
+      const response = await axios.get(
+        `https://themealdb.com/api/json/v1/1/lookup.php?i=${id}`
+      );
+      if (response && response.data) {
+        setMeal(response.data.meals[0]);
+        setLoading(false);
+      }
+    } catch (err) {
+      console.log("error: ", err);
     }
+  };
 
-    const ingredientsIndexes = (meal: any)=>{
-        if(!meal) return [];
-        let indexes = [];
-        for(let i = 1; i<=20; i++){
-            if(meal['strIngredient'+i]){
-                indexes.push(i);
-            }
-        }
-
-        return indexes;
+  const ingredientsIndexes = (meal: any) => {
+    if (!meal) return [];
+    let indexes = [];
+    for (let i = 1; i <= 20; i++) {
+      if (meal["strIngredient" + i]) {
+        indexes.push(i);
+      }
     }
+    return indexes;
+  };
 
-    const getYoutubeVideoId = (url: string)=>{
-        const regex = /[?&]v=([^&]+)/;
-        const match = url.match(regex);
-        if (match && match[1]) {
-          return match[1];
-        }
-        return null;
-    }
+  const renderIngredients = () => {
+    if (!meal) return null;
 
-    const handleOpenLink = (url: string)=>{
-        Linking.openURL(url);
-    }
+    return ingredientsIndexes(meal).map((i) => (
+      <View key={i} style={styles.ingredientContainer}>
+        <View style={styles.bullet} />
+        <View>
+          <Text style={styles.ingredientText}>{meal["strMeasure" + i]}</Text>
+          <Text style={styles.ingredientText}>{meal["strIngredient" + i]}</Text>
+        </View>
+      </View>
+    ));
+  };
+
+  const renderInstructions = () => {
+    if (!meal || !("strInstructions" in meal)) return null;
+
+    const instructionsArray = (meal as any).strInstructions.split("\r\n");
+    return instructionsArray.map((instruction: string, index: number) => (
+      <View key={index} style={styles.instructionContainer}>
+        <Text style={styles.instructionText}>{`${
+          index + 1
+        }. ${instruction}`}</Text>
+      </View>
+    ));
+  };
 
   return (
-    <View style = {{backgroundColor: 'white'}}>
-        <StatusBar style={"light"} />
-        <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{paddingBottom: 30}}
-        >
-        
-        {/* recipe image */}
-        <View>
-            <CachedImage
-                uri={item.strMealThumb}
-                // sharedTransitionTag={item.strMeal} // this will only work on native image (now using Image from expo-image)
-                style={{width: wp(100), height: hp(50),borderBottomLeftRadius: 40, borderBottomRightRadius: 40}}
+    <View style={styles.container}>
+      <StatusBar style="light" />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollViewContent}
+      >
+        {/* Recipe Image */}
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <Image
+            source={{ uri: item.strMealThumb }}
+            style={{
+              width: wp(100),
+              height: hp(50),
+              borderBottomLeftRadius: 40,
+              borderBottomRightRadius: 40,
+            }}
+          />
+        )}
 
+        {/* Back Button and Favourite Icon */}
+        <View style={styles.iconContainer}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.icon}
+          >
+            <ChevronLeftIcon size={hp(3.5)} strokeWidth={4.5} color="#fbbf24" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setIsFavourite(!isFavourite)}
+            style={styles.icon}
+          >
+            <HeartIcon
+              size={hp(3.5)}
+              strokeWidth={4.5}
+              color={isFavourite ? "red" : "gray"}
             />
+          </TouchableOpacity>
         </View>
 
-        {/* back button */}
-        {/* <Animated.View entering={FadeIn.delay(200).duration(1000)}> */}
-            <TouchableOpacity onPress={()=> navigation.goBack()}>
-                <ChevronLeftIcon size={hp(3.5)} strokeWidth={4.5} color="#fbbf24" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={()=> setIsFavourite(!isFavourite)}>
-                <HeartIcon size={hp(3.5)} strokeWidth={4.5} color={isFavourite? "red": "gray"} />
-            </TouchableOpacity>
-        {/* </Animated.View> */}
+        {/* Meal Description */}
+        {loading ? (
+          <Loading size="large" />
+        ) : (
+          <View style={styles.mealDetailsContainer}>
+            <Text style={styles.mealName}>{(meal as any)?.strMeal || ""}</Text>
+            <Text style={styles.mealArea}>
+              {meal && (meal as any)?.strArea ? (meal as any).strArea : ""}
+            </Text>
 
-        {/* meal description */}
-        {
-            loading? (
-                <Loading size="large"/>
-            ):(
-                <View>
-                    {/* name and area */}
-                    {/* <Animated.View entering={FadeInDown.duration(700).springify().damping(12)}> */}
-                        <Text style={{fontSize: hp(3)}}>
-                            {meal?.strMeal}
-                        </Text>
-                        <Text style={{fontSize: hp(2)}}>
-                            {meal?.strArea}
-                        </Text>
-                    {/* </Animated.View> */}
-
-                    {/* misc */}
-                    {/* <Animated.View entering={FadeInDown.delay(100).duration(700).springify().damping(12)}> */}
-                        <View>
-                            <View 
-                                style={{height: hp(6.5), width: hp(6.5)}}
-                            >
-                                <ClockIcon size={hp(4)} strokeWidth={2.5} color="#525252" />
-                            </View>
-                            <View>
-                                <Text style={{fontSize: hp(2)}}>
-                                    35
-                                </Text>
-                                <Text style={{fontSize: hp(1.3)}}>
-                                    Mins
-                                </Text>
-                            </View>
-                        </View>
-                        <View>
-                            <View 
-                                style={{height: hp(6.5), width: hp(6.5)}}
-    
-                            >
-                                <UsersIcon size={hp(4)} strokeWidth={2.5} color="#525252" />
-                            </View>
-                            <View>
-                                <Text style={{fontSize: hp(2)}}>
-                                    03
-                                </Text>
-                                <Text style={{fontSize: hp(1.3)}}>
-                                    Servings
-                                </Text>
-                            </View>
-                        </View>
-                        <View>
-                            <View 
-                                style={{height: hp(6.5), width: hp(6.5)}}
-                            >
-                                <FireIcon size={hp(4)} strokeWidth={2.5} color="#525252" />
-                            </View>
-                            <View>
-                                <Text style={{fontSize: hp(2)}}>
-                                    103
-                                </Text>
-                                <Text style={{fontSize: hp(1.3)}}>
-                                    Cal
-                                </Text>
-                            </View>
-                        </View>
-                        <View>
-                            <View 
-                                style={{height: hp(6.5), width: hp(6.5)}}
-                            >
-                                <Square3Stack3DIcon size={hp(4)} strokeWidth={2.5} color="#525252" />
-                            </View>
-                            <View>
-                                <Text style={{fontSize: hp(2)}}>
-                                    
-                                </Text>
-                                <Text style={{fontSize: hp(1.3)}}>
-                                    Easy
-                                </Text>
-                            </View>
-                        </View>
-                    {/* </Animated.View> */}
-
-                    {/* ingredients */}
-                    {/* <Animated.View entering={FadeInDown.delay(200).duration(700).springify().damping(12)}> */}
-                        <Text style={{fontSize: hp(2.5)}}>
-                            Ingredients
-                        </Text>
-                        <View>
-                            {
-                                ingredientsIndexes(meal).map(i=>{
-                                    return (
-                                        <View key={i}>
-                                            <View style={{height: hp(1.5), width: hp(1.5)}}/>
-                                            <View>
-                                                    <Text style={{fontSize: hp(1.7)}}>{meal['strMeasure'+i]}</Text>
-                                                    <Text style={{fontSize: hp(1.7)}}>{meal['strIngredient'+i]}</Text>
-                                            </View>
-                                        </View>
-                                    )
-                                })
-                            }
-                        </View>
-                    {/* </Animated.View> */}
-                    {/* instructions */}
-                    {/* <Animated.View entering={FadeInDown.delay(300).duration(700).springify().damping(12)}> */}
-                        <Text style={{fontSize: hp(2.5)}}>
-                            Instructions
-                        </Text>
-                        <Text style={{fontSize: hp(1.6)}}>
-                            {
-                                meal?.strInstructions
-                            }
-                        </Text>
-                    {/* </Animated.View> */}
-
+            {/* Miscellaneous */}
+            <View style={styles.miscContainer}>
+              <View style={styles.miscItem}>
+                <ClockIcon size={hp(4)} strokeWidth={2.5} color="#525252" />
+                <View style={styles.miscTextContainer}>
+                  <Text style={styles.miscValue}>35</Text>
+                  <Text style={styles.miscLabel}>Mins</Text>
                 </View>
-            )
-        }
-        </ScrollView>
+              </View>
+              <View style={styles.miscItem}>
+                <UserIcon size={hp(4)} strokeWidth={2.5} color="#525252" />
+                <View style={styles.miscTextContainer}>
+                  <Text style={styles.miscValue}>03</Text>
+                  <Text style={styles.miscLabel}>Servings</Text>
+                </View>
+              </View>
+              {/* Add more miscellaneous items as needed */}
+            </View>
+
+            {/* Ingredients */}
+            <Text style={styles.sectionHeading}>Ingredients</Text>
+            <View style={styles.ingredientsContainer}>
+              {renderIngredients()}
+            </View>
+
+            {/* Instructions */}
+            <Text style={styles.sectionHeading}>Instructions</Text>
+            <View style={styles.instructionsContainer}>
+              {renderInstructions()}
+            </View>
+          </View>
+        )}
+      </ScrollView>
     </View>
-    
-  )
-}
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+  scrollViewContent: {
+    paddingBottom: 30,
+  },
+  recipeImage: {
+    width: wp(100),
+    height: hp(50),
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+  },
+  iconContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginHorizontal: wp(5),
+    marginTop: hp(2),
+  },
+  icon: {
+    height: hp(3.5),
+    width: hp(3.5),
+  },
+  mealDetailsContainer: {
+    marginHorizontal: wp(5),
+  },
+  mealName: {
+    fontSize: hp(3),
+    fontWeight: "bold",
+    marginBottom: hp(1),
+  },
+  mealArea: {
+    fontSize: hp(2),
+    color: "#555",
+    marginBottom: hp(2),
+  },
+  miscContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: hp(2),
+    paddingHorizontal: wp(21),
+  },
+  miscItem: {
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  miscTextContainer: {
+    alignItems: "center",
+    marginTop: hp(1),
+    marginLeft: hp(1),
+  },
+  miscValue: {
+    fontSize: hp(2),
+    fontWeight: "bold",
+  },
+  miscLabel: {
+    fontSize: hp(1.3),
+    color: "#555",
+  },
+  sectionHeading: {
+    fontSize: hp(2.5),
+    fontWeight: "bold",
+    marginVertical: hp(2),
+  },
+  ingredientsContainer: {
+    marginLeft: wp(2),
+  },
+  ingredientContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: hp(1),
+  },
+  bullet: {
+    height: hp(1.5),
+    width: hp(1.5),
+    backgroundColor: "#fbbf24",
+    borderRadius: hp(0.75),
+    marginRight: wp(2),
+  },
+  ingredientText: {
+    fontSize: hp(1.7),
+  },
+  instructionsContainer: {
+    borderWidth: 1,
+    borderColor: "#e2e2e2",
+    borderRadius: 8,
+    padding: hp(1.5),
+    marginTop: hp(1.5),
+  },
+  instructionContainer: {
+    marginBottom: hp(1),
+  },
+  instructionText: {
+    fontSize: hp(1.6),
+    color: "#555",
+  },
+});
+
+export default RecipeDetailScreen;
