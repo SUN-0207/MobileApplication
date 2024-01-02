@@ -3,9 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Camera, CameraType  } from 'expo-camera';
 import {StatusBar} from 'expo-status-bar'
 import * as tf from '@tensorflow/tfjs';
-import { fetch, decodeJpeg } from '@tensorflow/tfjs-react-native';
 import * as mobilenet from '@tensorflow-models/mobilenet';
+import { fetch, decodeJpeg } from '@tensorflow/tfjs-react-native';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 
 let camera: Camera
 
@@ -25,6 +26,12 @@ const Scan = () => {
   const [cameraType, setCameraType] = useState(CameraType.back)
   const [flashMode, setFlashMode] = useState('off')
   
+  let options = {
+    quality: 1,
+    base64: true,
+    exif: false,
+  };
+  
   const __startCamera = async () => {
     const {status} = await Camera.requestCameraPermissionsAsync()
     
@@ -36,8 +43,8 @@ const Scan = () => {
   }
 
   const __takePicture = async () => {
-    const photo: any = await camera.takePictureAsync()
-    console.log(photo)
+    const photo: any = await camera.takePictureAsync(options)
+    // console.log(photo)
     
     setPreviewVisible(true)
     //setStartCamera(false)
@@ -184,52 +191,73 @@ const Scan = () => {
   )
 }
 
+interface ScanResult {
+  name: 'string';
+  }
  
 const CameraPreview = ({photo, retakePicture}: any) => {
-  const [isTfReady, setIsTfReady] = useState(false);
   const navigation = useNavigation();
-  useEffect(() => {
-    async function loadModel() {
-      try {
-        await tf.ready();
-        // console.log(photo)
-        setIsTfReady(true);
-      } catch (error) {
-        console.error('Error loading model:', error);
-        // Handle model loading errors appropriately (e.g., display error message)
-      }
-    }
+  const [isRunning, setIsRunning] = useState(false);
+  
 
-    loadModel();
+   const PAT = '5af3f540e5be400b8ff9d3e59d88771c';
+    const USER_ID = 'clarifai';       
+    const APP_ID = 'main';
+    const MODEL_ID = 'food-item-recognition';
+    const MODEL_VERSION_ID = '1d5fd481e0cf4826aa72ec3ff049e044';    
+    const data = photo.base64;
+      const raw = JSON.stringify({
+        "user_app_id": {
+            "user_id": USER_ID,
+            "app_id": APP_ID
+        },
+        "inputs": [
+            {
+                "data": {
+                    "image": {
+                        "base64": data
+                    }
+                }
+            }
+        ]
+    });
+  
+  const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Key ' + PAT
+        },
+        body: raw
+    };
+  useEffect(() => {
   }, []);
 
-  const fetchImage = async (photo) => {
-    const res = await fetch(photo.uri, {}, { isBinary: true });
-    const imageDataArrayBuffer = await res.arrayBuffer();
-    const imageData = new Uint8Array(imageDataArrayBuffer);
-    
-    const imageTensor = decodeJpeg(imageData);
-    console.log(imageTensor)
-    return imageTensor
-  };
 
-  const handlePrediction = async () => {
-    if (!isTfReady) {
-      console.log('Model not ready yet');
-      return;
-    }
-  
-    // const model = await mobilenet.load()  
-    // Make predictions
-    // const image = await fetchImage(photo)
-    // const prediction = await model.classify(image);
-    // // Display the results
-    // const topPrediction = tf.argMax(prediction, 1).dataSync()[0];
-    // console.log(`Predicted class: ${topPrediction}`);
+  const [result, setResult] = useState();
     
+  const handlePrediction = async () => {
+    setIsRunning(true);
+    try {
+      const res = await axios.post(`https://api.clarifai.com/v2/models/${MODEL_ID}/versions/${MODEL_VERSION_ID}/outputs`, raw, requestOptions)
+      //  .then(
+      //   res => {
+      //     console.log(res.data.outputs[0].data.concepts.name) 
+      //     // (result); 
+      //   }); r sao gan
+    
+      setResult(res.data.outputs[0].data.concepts[0].name)
+      console.log(result)
+      // const concepts = response.data.outputs[0].data.concepts; dung chua
+      // setResult()
+      setIsRunning(false);
+    } catch (error) {
+      console.log('error', error);
+    }
+   
     navigation.navigate('Recipe' as never);
-    retakePicture()
-  }
+    retakePicture();
+  };
 
   return (
     <View
@@ -246,7 +274,6 @@ const CameraPreview = ({photo, retakePicture}: any) => {
           flex: 1
         }}
       >
-      
         <View
           style={{
             flex: 1,
@@ -302,8 +329,25 @@ const CameraPreview = ({photo, retakePicture}: any) => {
           </View>
         </View>
       </ImageBackground>
+      {isRunning ? (
+        <ActivityIndicator
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999,
+          }}
+        />
+      ) : (
+        <View />
+      )}
     </View>
-  )
+  );
 }
 
 export default Scan
