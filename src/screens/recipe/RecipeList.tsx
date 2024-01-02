@@ -19,17 +19,24 @@ interface Meal {
   strMealThumb: string;
 }
 
-const RecipeListScreen = () => {
+interface RecipeListScreenProps {
+  route: any;
+}
 
+const RecipeListScreen: React.FC<RecipeListScreenProps> = (props) => {
+  const {route} = props;
+  const item = route.params;
   const [activeCategory, setActiveCategory] = useState<string>('Beef');
   const [categories, setCategories] = useState<Category[]>([]);
   const [meals, setMeals] = useState<Meal[]>([]);
   const [activeSearchContent, setActiveSearchContent] = useState<string>();
 
   useEffect(() => {
-    getCategories();
-    getRecipes();
-  }, []);
+    getCategories();  
+    if(item.scanResult){
+      handleChangeCategory(item.scanResult)
+    } else getRecipes();
+  },[]);
 
   const handleChangeCategory = (category: string) => {
     setActiveCategory(category);
