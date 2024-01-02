@@ -94,6 +94,29 @@ const RecipeDetailScreen: React.FC<RecipeDetailScreenProps> = (props) => {
     ));
   };
 
+  const addIngredientToCart = () => {
+    setIsFavourite(!isFavourite)
+    if (!meal) return null;
+    ingredientsIndexes(meal).map((i) => {
+      const ingredientData = {
+        name: meal["strIngredient" + i],
+        description: meal["strMeasure" + i],
+      };
+      fetch('https://let-me-cook.onrender.com/ingredients', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(ingredientData),
+      })
+      .then((response) => response.json())
+      .catch((error) => {
+        console.error(error);
+      });
+    })
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -125,7 +148,8 @@ const RecipeDetailScreen: React.FC<RecipeDetailScreenProps> = (props) => {
             <ChevronLeftIcon size={hp(3.5)} strokeWidth={4.5} color="#fbbf24" />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setIsFavourite(!isFavourite)}
+            // onPress={() => setIsFavourite(!isFavourite)}
+            onPress={addIngredientToCart}
             style={styles.icon}
           >
             <HeartIcon
