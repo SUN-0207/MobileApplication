@@ -19,7 +19,7 @@ import {
   FireIcon,
   UserIcon,
 } from "react-native-heroicons/outline";
-import { HeartIcon } from "react-native-heroicons/outline";
+import { HeartIcon, ShoppingCartIcon } from "react-native-heroicons/outline";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import Loading from "./component/Loading";
@@ -94,6 +94,29 @@ const RecipeDetailScreen: React.FC<RecipeDetailScreenProps> = (props) => {
     ));
   };
 
+  const addIngredientToCart = () => {
+    setIsFavourite(!isFavourite)
+    if (!meal) return null;
+    ingredientsIndexes(meal).map((i) => {
+      const ingredientData = {
+        name: meal["strIngredient" + i],
+        description: meal["strMeasure" + i],
+      };
+      fetch('https://let-me-cook.onrender.com/ingredients', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(ingredientData),
+      })
+      .then((response) => response.json())
+      .catch((error) => {
+        console.error(error);
+      });
+    })
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
@@ -133,6 +156,12 @@ const RecipeDetailScreen: React.FC<RecipeDetailScreenProps> = (props) => {
               strokeWidth={4.5}
               color={isFavourite ? "red" : "gray"}
             />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={addIngredientToCart}
+            style={styles.icon}
+          >
+            <ShoppingCartIcon size={hp(3.5)} strokeWidth={4.5} color="gray" />
           </TouchableOpacity>
         </View>
 
