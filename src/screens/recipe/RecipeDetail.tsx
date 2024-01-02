@@ -19,7 +19,7 @@ import {
   FireIcon,
   UserIcon,
 } from "react-native-heroicons/outline";
-import { HeartIcon } from "react-native-heroicons/outline";
+import { HeartIcon, ShoppingCartIcon } from "react-native-heroicons/outline";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import Loading from "./component/Loading";
@@ -148,8 +148,7 @@ const RecipeDetailScreen: React.FC<RecipeDetailScreenProps> = (props) => {
             <ChevronLeftIcon size={hp(3.5)} strokeWidth={4.5} color="#fbbf24" />
           </TouchableOpacity>
           <TouchableOpacity
-            // onPress={() => setIsFavourite(!isFavourite)}
-            onPress={addIngredientToCart}
+            onPress={() => setIsFavourite(!isFavourite)}
             style={styles.icon}
           >
             <HeartIcon
@@ -157,6 +156,12 @@ const RecipeDetailScreen: React.FC<RecipeDetailScreenProps> = (props) => {
               strokeWidth={4.5}
               color={isFavourite ? "red" : "gray"}
             />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={addIngredientToCart}
+            style={styles.icon}
+          >
+            <ShoppingCartIcon size={hp(3.5)} strokeWidth={4.5} color="gray" />
           </TouchableOpacity>
         </View>
 
