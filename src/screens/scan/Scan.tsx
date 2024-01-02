@@ -16,7 +16,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center'
-  }
+  },
+  subTitleText: {
+    fontSize: 16,
+    fontWeight: '500',
+},
 })
 
 const Scan = () => {
@@ -192,7 +196,10 @@ const Scan = () => {
 }
 
 interface ScanResult {
-  name: 'string';
+  app_id: string;
+  id: string;
+  name: string;
+  value: number;
   }
  
 const CameraPreview = ({photo, retakePicture}: any) => {
@@ -234,29 +241,20 @@ const CameraPreview = ({photo, retakePicture}: any) => {
   }, []);
 
 
-  const [result, setResult] = useState();
+  const [result, setResult] = useState<ScanResult[]>([]);
     
   const handlePrediction = async () => {
     setIsRunning(true);
     try {
       const res = await axios.post(`https://api.clarifai.com/v2/models/${MODEL_ID}/versions/${MODEL_VERSION_ID}/outputs`, raw, requestOptions)
-      //  .then(
-      //   res => {
-      //     console.log(res.data.outputs[0].data.concepts.name) 
-      //     // (result); 
-      //   }); r sao gan
-    
-      setResult(res.data.outputs[0].data.concepts[0].name)
-      console.log(result)
-      // const concepts = response.data.outputs[0].data.concepts; dung chua
-      // setResult()
+      setResult(res.data.outputs[0].data.concepts);
       setIsRunning(false);
     } catch (error) {
       console.log('error', error);
     }
-   
-    navigation.navigate('Recipe' as never);
-    retakePicture();
+    console.log('Res',result) 
+    // navigation.navigate('Recipe' as never);
+    // retakePicture();
   };
 
   return (
@@ -268,6 +266,49 @@ const CameraPreview = ({photo, retakePicture}: any) => {
         height: '100%'
       }}
     >
+            <Text style={[{ marginTop: 40, marginHorizontal: 30, fontSize: 18, textAlign:'center', color: '#3935FF',fontWeight: 'bold' }]}>
+                Select 1 detected ingredient 
+            </Text>
+            {result.length === 0 ?  <Text style={[{fontSize: 15, textAlign:'center', color: '#3935FF' , marginTop: 5}]}>Please Click Button Detect</Text>  :
+                <View>
+                    <View style={{ display: 'flex', flexDirection: 'column', alignItems:'center', marginTop: 10, alignContent:'center', marginBottom:5 }}>
+                        <View style={{ display: 'flex', flexDirection: 'row' }}>
+                        <TouchableOpacity
+                            style={{ paddingRight: 20 }}
+                           
+                        >
+                            <Text style={[styles.subTitleText, { marginBottom: 10, color: '#3935FF'}]}>
+                                1.{result[0].name}
+                            </Text>
+                        </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{ paddingRight: 20 }}
+                            
+                            >
+                                <Text style={[styles.subTitleText, { marginBottom: 10, color: '#3935FF'}]}>
+                                    2.{result[1].name}
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{ paddingRight: 20 }}
+                              
+                            >
+                                <Text style={[styles.subTitleText, { marginBottom: 10, color: '#3935FF'}]}>
+                                    3.{result[2].name}
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{ paddingRight: 20 }}
+                              
+                            >
+                                <Text style={[styles.subTitleText, { marginBottom: 10, color: '#3935FF'}]}>
+                                   4.{result[3].name}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            }
       <ImageBackground
         source={{uri: photo && photo.uri}}
         style={{
@@ -323,7 +364,7 @@ const CameraPreview = ({photo, retakePicture}: any) => {
                   fontSize: 20,
                 }}
               >
-                Find Recipe
+                Detect 
               </Text>
             </TouchableOpacity>
           </View>
