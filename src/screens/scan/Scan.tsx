@@ -252,10 +252,11 @@ const CameraPreview = ({photo, retakePicture}: any) => {
     } catch (error) {
       console.log('error', error);
     }
-    console.log('Res',result) 
+
     // navigation.navigate('Recipe' as never);
     // retakePicture();
   };
+
 
   return (
     <View
@@ -275,7 +276,9 @@ const CameraPreview = ({photo, retakePicture}: any) => {
                         <View style={{ display: 'flex', flexDirection: 'row' }}>
                         <TouchableOpacity
                             style={{ paddingRight: 20 }}
-                           
+                             onPress={() => 
+                                navigation.navigate('Recipe' , {props: result[0].name}) 
+                            }
                         >
                             <Text style={[styles.subTitleText, { marginBottom: 10, color: '#3935FF'}]}>
                                 1.{result[0].name}
@@ -283,7 +286,9 @@ const CameraPreview = ({photo, retakePicture}: any) => {
                         </TouchableOpacity>
                             <TouchableOpacity
                                 style={{ paddingRight: 20 }}
-                            
+                                onPress={() =>  
+                                  navigation.navigate('Recipe' , {props: result[1].name}) 
+                              }
                             >
                                 <Text style={[styles.subTitleText, { marginBottom: 10, color: '#3935FF'}]}>
                                     2.{result[1].name}
@@ -291,7 +296,9 @@ const CameraPreview = ({photo, retakePicture}: any) => {
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={{ paddingRight: 20 }}
-                              
+                                onPress={() => 
+                                  navigation.navigate('Recipe' , {props: result[2].name}) 
+                              }
                             >
                                 <Text style={[styles.subTitleText, { marginBottom: 10, color: '#3935FF'}]}>
                                     3.{result[2].name}
@@ -299,7 +306,9 @@ const CameraPreview = ({photo, retakePicture}: any) => {
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={{ paddingRight: 20 }}
-                              
+                                onPress={() => 
+                                  navigation.navigate('Recipe' , {props: result[3].name}) 
+                              }
                             >
                                 <Text style={[styles.subTitleText, { marginBottom: 10, color: '#3935FF'}]}>
                                    4.{result[3].name}

@@ -31,12 +31,14 @@ const RecipeListScreen: React.FC<RecipeListScreenProps> = (props) => {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [activeSearchContent, setActiveSearchContent] = useState<string>();
 
-  useEffect(() => {
+  useEffect(() => { 
+ 
     getCategories();  
+   
     if(item.scanResult){
       handleChangeCategory(item.scanResult)
     } else getRecipes();
-  },[]);
+  }, [props]);
 
   const handleChangeCategory = (category: string) => {
     setActiveCategory(category);
@@ -88,7 +90,7 @@ const RecipeListScreen: React.FC<RecipeListScreenProps> = (props) => {
       >
         <View style={styles.searchBar}>
           <TextInput
-            placeholder='Tim cong thuc'
+            placeholder='Search recipes '
             placeholderTextColor={'gray'}
             style={{fontSize: hp(1.7), flex: 1, marginBottom: 1, paddingLeft: 3, flexDirection: 'row', alignItems: 'center'}}
             onChangeText={(text) => handleSearch(text)}
