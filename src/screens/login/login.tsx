@@ -76,8 +76,8 @@ export default function Login(props) {
             console.log(json);
             if (json.error) {
               // Handle registration error
-              setLoginStatus(true);
             } else {
+              setLoginStatus(true);
               // Handle registration success
               navigation.navigate('Home' as never);
             }
