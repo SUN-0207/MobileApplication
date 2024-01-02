@@ -19,23 +19,35 @@ interface Meal {
   strMealThumb: string;
 }
 
-const RecipeListScreen = () => {
+interface RecipeListScreenProps {
+  route: any;
+}
 
+const RecipeListScreen: React.FC<RecipeListScreenProps> = (props) => {
+  const {route} = props;
+  const item = route.params;
   const [activeCategory, setActiveCategory] = useState<string>('Beef');
   const [categories, setCategories] = useState<Category[]>([]);
   const [meals, setMeals] = useState<Meal[]>([]);
-  const [searchContent, setSearchContent] = useState<string>();
+  const [activeSearchContent, setActiveSearchContent] = useState<string>();
 
   useEffect(() => {
-    getCategories();
-    getRecipes();
-  }, []);
+    getCategories();  
+    if(item.scanResult){
+      handleChangeCategory(item.scanResult)
+    } else getRecipes();
+  },[]);
 
   const handleChangeCategory = (category: string) => {
     setActiveCategory(category);
-    getRecipes(category);
+    getRecipes(category, activeSearchContent);
     setMeals([]);
   };
+
+  const handleSearch = (searchContent: string) => {
+    setActiveSearchContent(searchContent);
+    getRecipes(activeCategory, activeSearchContent);
+  }
 
   const getCategories = async () => {
     try {
@@ -79,7 +91,7 @@ const RecipeListScreen = () => {
             placeholder='Tim cong thuc'
             placeholderTextColor={'gray'}
             style={{fontSize: hp(1.7), flex: 1, marginBottom: 1, paddingLeft: 3, flexDirection: 'row', alignItems: 'center'}}
-            onChangeText={(text) => getRecipes(activeCategory, text)}
+            onChangeText={(text) => handleSearch(text)}
           />
           <View style={{backgroundColor:'white', padding: 12, borderRadius:710}}>
             <MagnifyingGlassIcon size={hp(2.5)} strokeWidth={3} color="gray" />

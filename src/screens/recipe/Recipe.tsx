@@ -14,6 +14,7 @@ export const Recipe = () => {
       <RecipeStack.Screen
         name="RecipeListScreen"
         options={{ headerShown: false }}
+        initialParams={{scanResult: "seAfOOd"}}
         component={RecipeListScreen}
       />
       <RecipeStack.Screen
