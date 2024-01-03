@@ -17,17 +17,17 @@ export const ApplicationNavigation = () => {
   const [loading, setLoading] = useState(false);
 
   const triggerDeploy = async () => {
-    setLoading(true);
+    // setLoading(true);
 
-    try {
-      const response = await axios.post("https://api.render.com/deploy/srv-clpgk7hoh6hc73c32oeg?key=euU9Q6KyNTA");
+    // try {
+    //   const response = await axios.post("https://api.render.com/deploy/srv-clpgk7hoh6hc73c32oeg?key=euU9Q6KyNTA");
 
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+    //   console.log(response.data);
+    // } catch (error) {
+    //   console.error(error);
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   useEffect(() => {
