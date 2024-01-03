@@ -114,6 +114,12 @@ export default function Login(props) {
                 placeholder="Password"
                 onChangeText={text => setPasswordInput(text)}
             />
+             {!isLogin && (<TextInput
+                secureTextEntry={true}
+                 style={[styles.input]}
+                placeholder="Retype Password"
+                onChangeText={text => setPasswordInput(text)}
+            />)}
             </View>
             <TouchableOpacity >
                 {isLogin && (
@@ -306,7 +312,7 @@ const styles = StyleSheet.create({
       iconText: {
         marginBottom: 20,
         fontSize: 12,
-        marginTop: 50,
+        marginTop: 30,
         textAlign: 'center',
         color: '#3935FF',
         fontWeight: 'bold'
