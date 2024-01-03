@@ -23,14 +23,13 @@ const Categories: React.FC<CategoriesProps> = ({ categories, activeCategory, han
       >
         {categories.map((cat, index) => {
           let isActive = cat.strCategory === activeCategory;
-          let activeButtonClass = isActive ? ' bg-amber-400' : ' bg-black/10';
           return (
             <TouchableOpacity
               key={index}
               onPress={() => handleChangeCategory(cat.strCategory)}
               style={{ flex: 1, alignItems: 'center', marginHorizontal: 4 }}
             >
-              <View style={{ borderRadius: 999, padding: 6, backgroundColor: activeButtonClass }}>
+              <View style={{ borderRadius: 999, padding: 6, backgroundColor: isActive ? 'orange' : 'white' }}>
                 <Image
                   source={{ uri: cat.strCategoryThumb }}
                   style={{ width: hp(6), height: hp(6), borderRadius: hp(6) / 2 }}
